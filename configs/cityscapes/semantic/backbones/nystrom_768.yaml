@@ -1,0 +1,42 @@
+# Backbone benchmark: nystrom @ 768px. Recipe: nb2 + qor + thread + qsa.
+checkpoint_monitor: metrics/val_iou_all
+compile_disabled: true
+trainer:
+  precision: bf16-mixed
+  max_epochs: 107
+  devices: 4
+  logger:
+    class_path: loggers.OfflineFallbackWandbLogger
+    init_args:
+      resume: allow
+      project: luma
+      name: cityscapes_semantic_bb_768_nystrom
+model:
+  class_path: training.mask_classification_semantic.MaskClassificationSemantic
+  init_args:
+    attn_mask_annealing_enabled: false
+    lr: 0.0001
+    network:
+      class_path: models.luma.LUMA
+      init_args:
+        num_q: 100
+        num_blocks: 2
+        self_a: false
+        query_only_residual: true
+        thread_queries: true
+        query_self_attn: true
+        encoder:
+          class_path: models.nystrom.nystrom
+          init_args:
+            backbone_name: nystrom32_vit_small_patch16
+            nystrom_size: S_32
+            ckpt_path: weights/imagenet21k/Nystrom32_IN21k.pt
+            ls_init: null
+data:
+  class_path: datasets.cityscapes_semantic.CityscapesSemantic
+  init_args:
+    img_size:
+    - 768
+    - 768
+    batch_size: 4
+    path: data/cityscapes

@@ -1,0 +1,43 @@
+# Backbone benchmark: dinov2_large @ 224px. Recipe: nb2 + qor + thread + qsa.
+checkpoint_monitor: metrics/val_iou_all
+compile_disabled: true
+trainer:
+  precision: bf16-mixed
+  max_epochs: 31
+  devices: 2
+  logger:
+    class_path: loggers.OfflineFallbackWandbLogger
+    init_args:
+      resume: allow
+      project: luma
+      name: ade20k_semantic_bb_224_dinov2_large
+model:
+  class_path: training.mask_classification_semantic.MaskClassificationSemantic
+  init_args:
+    attn_mask_annealing_enabled: false
+    lr: 0.0001
+    network:
+      class_path: models.luma.LUMA
+      init_args:
+        num_q: 100
+        num_blocks: 2
+        self_a: false
+        query_only_residual: true
+        thread_queries: true
+        query_self_attn: true
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            backbone_name: vit_large_patch14_reg4_dinov2
+            patch_size: 16
+            pretrained: true
+            vit_size: L
+            emb_class: true
+data:
+  class_path: datasets.ade20k_semantic.ADE20KSemantic
+  init_args:
+    img_size:
+    - 224
+    - 224
+    batch_size: 8
+    path: data/ade20k

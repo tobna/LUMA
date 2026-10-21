@@ -1,0 +1,42 @@
+# EoMT baseline (original formulation) on COCO panoptic.
+# This is the pretraining stage for reproducing EoMT's ADE20K panoptic 50.6, which
+# the model zoo marks with superscript C = "pre-trained on COCO panoptic segmentation".
+checkpoint_monitor: metrics/val_pq_all
+compile_disabled: true
+trainer:
+  precision: bf16-mixed
+  max_epochs: 12
+  devices: 4
+  logger:
+    class_path: loggers.OfflineFallbackWandbLogger
+    init_args:
+      resume: allow
+      project: luma
+      name: "coco_panoptic_eomt_original_large_640"
+model:
+  class_path: training.mask_classification_panoptic.MaskClassificationPanoptic
+  init_args:
+    attn_mask_annealing_enabled: True
+    attn_mask_annealing_start_steps: [14782, 29564, 44346, 59128]
+    attn_mask_annealing_end_steps: [29564, 44346, 59128, 73910]
+    lr: 1e-4
+    network:
+      class_path: models.eomt_original.EoMT_Original
+      init_args:
+        num_q: 200
+        num_blocks: 4
+        masked_attn_enabled: True
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            backbone_name: "vit_large_patch14_reg4_dinov2"
+            patch_size: 16
+            pretrained: True
+            vit_size: "L"
+            emb_class: True
+data:
+  class_path: datasets.coco_panoptic.COCOPanoptic
+  init_args:
+    path: data/coco
+    batch_size: 4
+    stuff_classes: [80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132]

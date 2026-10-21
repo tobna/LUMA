@@ -1,0 +1,34 @@
+checkpoint_monitor: metrics/val_ap_all
+compile_disabled: true
+trainer:
+  precision: bf16-mixed
+  max_epochs: 12
+  devices: 4
+  check_val_every_n_epoch: 2
+  logger:
+    class_path: loggers.OfflineFallbackWandbLogger
+    init_args:
+      resume: allow
+      project: luma
+      name: "coco_instance_dinov2_large_640"
+model:
+  class_path: training.mask_classification_instance.MaskClassificationInstance
+  init_args:
+    attn_mask_annealing_enabled: False
+    network:
+      class_path: models.luma.LUMA
+      init_args:
+        num_q: 200
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            backbone_name: "vit_large_patch14_reg4_dinov2"
+            patch_size: 14
+            pretrained: True
+            vit_size: "L"
+            emb_class: True
+data:
+  class_path: datasets.coco_instance.COCOInstance
+  init_args:
+    path: data/coco
+    batch_size: 4

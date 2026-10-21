@@ -1,0 +1,43 @@
+# Scaling grid: dinov2_giant @ 1024px.
+checkpoint_monitor: metrics/val_iou_all
+compile_disabled: true
+trainer:
+  precision: bf16-mixed
+  max_epochs: 107
+  devices: 8
+  logger:
+    class_path: loggers.OfflineFallbackWandbLogger
+    init_args:
+      resume: allow
+      project: luma
+      name: cityscapes_semantic_sc_1024_dinov2_giant
+model:
+  class_path: training.mask_classification_semantic.MaskClassificationSemantic
+  init_args:
+    attn_mask_annealing_enabled: false
+    lr: 0.0001
+    network:
+      class_path: models.luma.LUMA
+      init_args:
+        num_q: 100
+        num_blocks: 2
+        self_a: false
+        query_only_residual: true
+        thread_queries: true
+        query_self_attn: true
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            backbone_name: vit_giant_patch14_reg4_dinov2
+            patch_size: 14
+            pretrained: true
+            vit_size: G
+            emb_class: true
+data:
+  class_path: datasets.cityscapes_semantic.CityscapesSemantic
+  init_args:
+    img_size:
+    - 1024
+    - 1024
+    batch_size: 2
+    path: data/cityscapes

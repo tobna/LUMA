@@ -1,0 +1,44 @@
+# Run-to-run variance, seed 1. Distinct path AND wandb name:
+# the logger is resume:allow and the output dir mirrors the config
+# path, so identical names would resume one run instead of three.
+checkpoint_monitor: metrics/val_iou_all
+compile_disabled: true
+trainer:
+  precision: bf16-mixed
+  max_epochs: 31
+  devices: 2
+  strategy: ddp_find_unused_parameters_true
+  logger:
+    class_path: loggers.OfflineFallbackWandbLogger
+    init_args:
+      resume: allow
+      project: luma
+      name: ade20k_semantic_512_wave_s1
+model:
+  class_path: training.mask_classification_semantic.MaskClassificationSemantic
+  init_args:
+    attn_mask_annealing_enabled: false
+    lr: 0.0001
+    network:
+      class_path: models.luma.LUMA
+      init_args:
+        num_q: 100
+        num_blocks: 2
+        self_a: false
+        query_only_residual: true
+        thread_queries: true
+        query_self_attn: true
+        encoder:
+          class_path: models.wave.wave
+          init_args:
+            backbone_name: wavevit_s
+            ckpt_path: weights/imagenet21k/WaveViT-S_IN21k.pt
+data:
+  class_path: datasets.ade20k_semantic.ADE20KSemantic
+  init_args:
+    img_size:
+    - 512
+    - 512
+    batch_size: 8
+    path: data/ade20k
+seed_everything: 1001

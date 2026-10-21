@@ -1,0 +1,102 @@
+# Pretraining sweep: aimv2_huge @ 640px (headline resolution only).
+checkpoint_monitor: metrics/val_pq_all
+compile_disabled: true
+trainer:
+  precision: bf16-mixed
+  max_epochs: 31
+  devices: 8
+  logger:
+    class_path: loggers.OfflineFallbackWandbLogger
+    init_args:
+      resume: allow
+      project: luma
+      name: ade20k_panoptic_pt_640_aimv2_huge
+model:
+  class_path: training.mask_classification_panoptic.MaskClassificationPanoptic
+  init_args:
+    attn_mask_annealing_enabled: true
+    attn_mask_annealing_start_steps:
+    - 9788
+    - 19576
+    attn_mask_annealing_end_steps:
+    - 19576
+    - 29364
+    lr: 0.0001
+    network:
+      class_path: models.luma.LUMA
+      init_args:
+        num_q: 200
+        num_blocks: 2
+        self_a: false
+        query_only_residual: true
+        thread_queries: true
+        query_self_attn: true
+        masked_cross_attn: true
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            backbone_name: aimv2_huge_patch14_224.apple_pt
+            patch_size: 14
+            pretrained: true
+            vit_size: AIMv2-H
+            emb_class: false
+            ls_init: null
+data:
+  class_path: datasets.ade20k_panoptic.ADE20KPanoptic
+  init_args:
+    img_size:
+    - 640
+    - 640
+    batch_size: 2
+    path: data/ade20k
+    stuff_classes:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 9
+    - 11
+    - 13
+    - 16
+    - 17
+    - 21
+    - 25
+    - 26
+    - 28
+    - 29
+    - 34
+    - 40
+    - 46
+    - 48
+    - 51
+    - 52
+    - 54
+    - 59
+    - 60
+    - 61
+    - 63
+    - 68
+    - 77
+    - 79
+    - 84
+    - 91
+    - 94
+    - 96
+    - 99
+    - 100
+    - 101
+    - 105
+    - 106
+    - 109
+    - 113
+    - 114
+    - 117
+    - 122
+    - 128
+    - 131
+    - 140
+    - 141
+    - 145

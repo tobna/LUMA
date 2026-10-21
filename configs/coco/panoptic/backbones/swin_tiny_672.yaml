@@ -1,0 +1,102 @@
+# Backbone benchmark: swin_tiny @ 672px. Recipe: nb2 + qor + thread + qsa + mask.
+checkpoint_monitor: metrics/val_pq_all
+compile_disabled: true
+trainer:
+  precision: bf16-mixed
+  max_epochs: 12
+  devices: 4
+  logger:
+    class_path: loggers.OfflineFallbackWandbLogger
+    init_args:
+      resume: allow
+      project: luma
+      name: coco_panoptic_bb_672_swin_tiny
+model:
+  class_path: training.mask_classification_panoptic.MaskClassificationPanoptic
+  init_args:
+    attn_mask_annealing_enabled: true
+    attn_mask_annealing_start_steps:
+    - 22176
+    - 44352
+    attn_mask_annealing_end_steps:
+    - 44352
+    - 66528
+    lr: 0.0001
+    network:
+      class_path: models.luma.LUMA
+      init_args:
+        num_q: 200
+        num_blocks: 2
+        self_a: false
+        query_only_residual: true
+        thread_queries: true
+        query_self_attn: true
+        masked_cross_attn: true
+        encoder:
+          class_path: models.swin.Swin
+          init_args:
+            backbone_name: swin_tiny_window7
+            ckpt_path: weights/imagenet21k/swin_tiny_patch4_window7.pt
+            swin_size: Ti
+data:
+  class_path: datasets.coco_panoptic.COCOPanoptic
+  init_args:
+    img_size:
+    - 672
+    - 672
+    batch_size: 4
+    path: data/coco
+    stuff_classes:
+    - 80
+    - 81
+    - 82
+    - 83
+    - 84
+    - 85
+    - 86
+    - 87
+    - 88
+    - 89
+    - 90
+    - 91
+    - 92
+    - 93
+    - 94
+    - 95
+    - 96
+    - 97
+    - 98
+    - 99
+    - 100
+    - 101
+    - 102
+    - 103
+    - 104
+    - 105
+    - 106
+    - 107
+    - 108
+    - 109
+    - 110
+    - 111
+    - 112
+    - 113
+    - 114
+    - 115
+    - 116
+    - 117
+    - 118
+    - 119
+    - 120
+    - 121
+    - 122
+    - 123
+    - 124
+    - 125
+    - 126
+    - 127
+    - 128
+    - 129
+    - 130
+    - 131
+    - 132

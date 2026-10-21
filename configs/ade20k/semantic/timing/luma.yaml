@@ -1,0 +1,47 @@
+# Training-time comparison, our recipe. Submit with --gpus 4 --partition H100
+# so both arms land on identical hardware. 500 steps, validation off.
+# NOTE: ours is nb2, EoMT_Original requires nb4 — say so in the paper.
+checkpoint_monitor: metrics/val_iou_all
+compile_disabled: true
+trainer:
+  precision: bf16-mixed
+  devices: 2
+  max_steps: 500
+  limit_val_batches: 0
+  num_sanity_val_steps: 0
+  logger:
+    class_path: loggers.OfflineFallbackWandbLogger
+    init_args:
+      resume: allow
+      project: luma
+      name: ade20k_semantic_512_timing_luma
+model:
+  class_path: training.mask_classification_semantic.MaskClassificationSemantic
+  init_args:
+    attn_mask_annealing_enabled: false
+    lr: 0.0001
+    network:
+      class_path: models.luma.LUMA
+      init_args:
+        num_q: 100
+        num_blocks: 2
+        self_a: false
+        query_only_residual: true
+        thread_queries: true
+        query_self_attn: true
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            backbone_name: vit_large_patch14_reg4_dinov2
+            patch_size: 16
+            pretrained: true
+            vit_size: L
+            emb_class: true
+data:
+  class_path: datasets.ade20k_semantic.ADE20KSemantic
+  init_args:
+    img_size:
+    - 512
+    - 512
+    batch_size: 8
+    path: data/ade20k

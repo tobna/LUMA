@@ -1,0 +1,51 @@
+# Training-time comparison, EoMT_Original baseline (requires num_blocks=4).
+checkpoint_monitor: metrics/val_iou_all
+compile_disabled: true
+trainer:
+  precision: bf16-mixed
+  devices: 2
+  max_steps: 500
+  limit_val_batches: 0
+  num_sanity_val_steps: 0
+  logger:
+    class_path: loggers.OfflineFallbackWandbLogger
+    init_args:
+      resume: allow
+      project: luma
+      name: ade20k_semantic_512_timing_eomt_original
+model:
+  class_path: training.mask_classification_semantic.MaskClassificationSemantic
+  init_args:
+    attn_mask_annealing_enabled: true
+    attn_mask_annealing_start_steps:
+    - 6525
+    - 13050
+    - 19575
+    - 26100
+    attn_mask_annealing_end_steps:
+    - 13050
+    - 19575
+    - 26100
+    - 32625
+    lr: 0.0001
+    network:
+      class_path: models.eomt_original.EoMT_Original
+      init_args:
+        num_q: 100
+        num_blocks: 4
+        encoder:
+          class_path: models.vit.ViT
+          init_args:
+            backbone_name: vit_large_patch14_reg4_dinov2
+            patch_size: 16
+            pretrained: true
+            vit_size: L
+            emb_class: true
+data:
+  class_path: datasets.ade20k_semantic.ADE20KSemantic
+  init_args:
+    img_size:
+    - 512
+    - 512
+    batch_size: 8
+    path: data/ade20k

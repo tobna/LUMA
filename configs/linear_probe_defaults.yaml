@@ -1,0 +1,37 @@
+# ── Linear probe defaults ──────────────────────────────────────────────────────
+# This file is auto-loaded by main_linear_probe.py as the first config.
+# Edit it to set your ImageNet path and preferred hyperparameters.
+# Every value here is overridable via additional -c files or CLI flags.
+#
+# The backbone encoder is NOT set here — it is extracted automatically from
+# whichever segmentation config you pass with -c.
+# The WandbLogger run name is NOT set here — it is derived automatically as
+# "{seg_config_name}_lp" and can be overridden with
+#   --trainer.logger.init_args.name my_name
+
+# ── Data ───────────────────────────────────────────────────────────────────────
+data:
+  class_path: datasets.imagenet.ImageNetDataModule
+  init_args:
+    path: data/imagenet # ← set your ImageNet root here
+    img_size: [224, 224] # standard crop; encoder pos-embeds auto-resize
+    batch_size: 1024
+    num_workers: 8
+
+# ── Trainer ────────────────────────────────────────────────────────────────────
+trainer:
+  max_epochs: 10
+  precision: bf16-mixed
+  logger:
+    class_path: loggers.OfflineFallbackWandbLogger
+    init_args:
+      resume: allow
+      project: luma
+
+# ── Model (head hyperparameters only — encoder comes from the seg config) ──────
+# Note: no class_path/init_args wrapper because subclass_mode_model=False;
+# keys map directly to LinearProbeImageNet.__init__ parameters.
+model:
+  lr: 0.01
+  weight_decay: 0.0 # no regularisation; linear probes don't overfit
+  warmup_steps: 100
