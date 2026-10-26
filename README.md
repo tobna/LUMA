@@ -18,7 +18,7 @@ The code is built on [EoMT](https://github.com/tue-mps/eomt); see [Acknowledgeme
 
 ## News
 
-- [26.10.2026] We have updated the **LUMA article** on [arxiv](https://arxiv.org/abs/2607.00687) 📜
+- [27.10.2026] We have updated the **LUMA article** on [arxiv](https://arxiv.org/abs/2607.00687) 📜
 - [21.10.2026] We release the **code** for LUMA in this repository ⚙️
 - [01.07.2026] The LUMA **preprint** is published on [arXiv](https://arxiv.org/abs/2607.00687) 🗞️
 
