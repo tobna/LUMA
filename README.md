@@ -18,6 +18,7 @@ The code is built on [EoMT](https://github.com/tue-mps/eomt); see [Acknowledgeme
 
 ## News
 
+- [26.10.2026] We have updated the **LUMA article** on [arxiv](https://arxiv.org/abs/2607.00687) 📜
 - [21.10.2026] We release the **code** for LUMA in this repository ⚙️
 - [01.07.2026] The LUMA **preprint** is published on [arXiv](https://arxiv.org/abs/2607.00687) 🗞️
 
@@ -35,17 +36,16 @@ The same head therefore attaches unchanged to plain, hierarchical, windowed, con
 
 With a DINOv2 ViT-L backbone, LUMA matches EoMT in accuracy and cost:
 
-| Dataset (val) | Metric | Input | EoMT&#8224; | LUMA | GFLOPs (EoMT / LUMA) | FPS (EoMT / LUMA) |
-| ------------- | ------ | ----- | ----------- | ---- | -------------------- | ----------------- |
-| ADE20K        | mIoU   | 512²  | 58.4        | 58.6 | 789 / 790            | 150 / 143         |
-| Cityscapes    | mIoU   | 1024² | 84.2        | 84.6 | 4350 / 4371          | 36 / 37           |
-| COCO          | PQ     | 640²  | 56.0        | 55.8 | 750 / 754            | 128 / 105         |
-| COCO          | PQ     | 1280² | 58.3        | 58.3 | 4146 / 4469          | 42 / 32           |
-| ADE20K        | PQ     | 640²  | 50.6\*      | 50.4 | 750 / 754            | 128 / 105         |
-| ADE20K        | PQ     | 1280² | 51.7\*      | 51.7 | 4146 / 4469          | 30 / 32           |
+| Dataset (val) | Metric | Input | EoMT   | LUMA | GFLOPs (EoMT / LUMA) | FPS (EoMT / LUMA) |
+| ------------- | ------ | ----- | ------ | ---- | -------------------- | ----------------- |
+| ADE20K        | mIoU   | 512²  | 58.4   | 58.6 | 789 / 790            | 150 / 143         |
+| Cityscapes    | mIoU   | 1024² | 84.2   | 84.6 | 4350 / 4371          | 36 / 37           |
+| COCO          | PQ     | 640²  | 56.0   | 55.8 | 750 / 754            | 128 / 105         |
+| COCO          | PQ     | 1280² | 58.3   | 58.3 | 4146 / 4469          | 42 / 32           |
+| ADE20K        | PQ     | 640²  | 50.6\* | 50.4 | 750 / 754            | 128 / 105         |
+| ADE20K        | PQ     | 1280² | 51.7\* | 51.7 | 4146 / 4469          | 30 / 32           |
 
-&#8224; Our re-implementation, measured on the same hardware as LUMA.
-\* EoMT's ADE20K panoptic models are first trained on COCO panoptic; LUMA's are not.
+Our EoMT re-implementation, measured on the same hardware as LUMA. EoMT's ADE20K panoptic models are first trained on COCO panoptic; LUMA's are not.
 
 With LUMA as the fixed head, the benchmark finds:
 
